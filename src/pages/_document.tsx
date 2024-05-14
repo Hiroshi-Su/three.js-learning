@@ -1,4 +1,4 @@
-import { GTM_ID } from 'lib/gtag'
+import { GTM_ID } from '@/lib/gtag'
 import Document, {
   Head,
   Main,
@@ -7,12 +7,12 @@ import Document, {
   DocumentContext,
   DocumentInitialProps,
 } from 'next/document'
-import Script from 'next/script'
+// import Script from 'next/script'
 import { ServerStyleSheet } from 'styled-components'
 
 class MyDocument extends Document {
   static async getInitialProps(
-    ctx: DocumentContext
+    ctx: DocumentContext,
   ): Promise<DocumentInitialProps> {
     const sheet = new ServerStyleSheet()
     const originalRenderPage = ctx.renderPage
@@ -32,6 +32,7 @@ class MyDocument extends Document {
   render() {
     return (
       <Html>
+        <Head />
         <body>
           {GTM_ID ? (
             <noscript>

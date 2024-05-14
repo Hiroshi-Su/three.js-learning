@@ -22,5 +22,6 @@
   "editor.formatOnType": false,
   "eslint.codeAction.showDocumentation": {
     "enable": true
-  }
+  },
+  "nuxt.isNuxtApp": false
 }

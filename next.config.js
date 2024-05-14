@@ -13,7 +13,7 @@ const nextConfig = {
     },
     removeConsole: Production(),
   },
-  reactStrictMode: true,
+  reactStrictMode: false,
   webpack(config) {
     config.module.rules.push({
       test: /\.svg$/i,
