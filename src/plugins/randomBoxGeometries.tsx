@@ -2,7 +2,8 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils'
 
-import SkyTexture from '@/assets/img/sky.jpeg'
+import SkyTexture from '@/assets/img/sky.jpg'
+import CraneTexture from '@/assets/img/crane.jpg'
 
 export class ThreeApp {
   render: () => void // レンダー
@@ -79,9 +80,9 @@ export class ThreeApp {
     /**
      * マテリアル定義のための定数
      */
-    const MATERIAL_PARAM = {
-      color: 0x3399ff, // マテリアルの基本色
-    }
+    // const MATERIAL_PARAM = {
+    //   color: 0x3399ff, // マテリアルの基本色
+    // }
 
     // レンダラー
     const color = new THREE.Color(RENDERER_PARAM.clearColor)
@@ -98,6 +99,7 @@ export class ThreeApp {
      */
     const textureLoader = new THREE.TextureLoader()
     const skyTexture = textureLoader.load(SkyTexture.src)
+    const craneTexture = textureLoader.load(CraneTexture.src)
     this.scene.background = skyTexture
 
     // カメラ
@@ -126,10 +128,13 @@ export class ThreeApp {
     this.scene.add(this.ambientLight)
 
     // マテリアル
-    this.material = new THREE.MeshPhongMaterial(MATERIAL_PARAM)
+    // this.material = new THREE.MeshPhongMaterial(MATERIAL_PARAM)
+    this.material = new THREE.MeshBasicMaterial({
+      map: craneTexture,
+    })
 
     // ジオメトリからメッシュを生成
-    this.boxGeometry = new THREE.BoxGeometry(1.0, 1.0, 1.0)
+    this.boxGeometry = new THREE.BoxGeometry(0.8, 0.8, 0.8)
     // this.box = new THREE.Mesh(this.boxGeometry, this.material)
     // this.scene.add(this.box)
 
@@ -153,7 +158,7 @@ export class ThreeApp {
       for (let j = 0; j < cellNum; j += 1) {
         for (let k = 0; k < cellNum; k += 1) {
           // 立方体個別の要素を作成
-          const geometryBox = new THREE.BoxGeometry(0.5, 0.5, 0.5)
+          const geometryBox = new THREE.BoxGeometry(0.4, 0.4, 0.4)
 
           // XYZ座標を設定
           const geometryTranslated = geometryBox.translate(
