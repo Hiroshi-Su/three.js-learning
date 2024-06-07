@@ -154,7 +154,7 @@ export class ThreeApp2 {
     this.scene.add(this.groupParent)
     this.scene.add(this.groupChild)
 
-    let rot = 0 // 角度
+    const rot = 0 // 角度
     // メッシュを生成
     // 一つのbox
     // this.box = new THREE.Mesh(this.boxGeometry, this.material)
@@ -321,8 +321,10 @@ export class ThreeApp2 {
       // フラグに応じてオブジェクトの状態を変化させる
       const yDirection = 0.01
 
-      if (this.groupParent.rotation.y === 0) {
-      } else if (this.groupParent.rotation.y < -1.35) {
+      // if (this.groupParent.rotation.y === 0) {
+
+      // } else
+      if (this.groupParent.rotation.y < -1.35) {
         this.switch = false
       } else if (this.groupParent.rotation.y > 1.35) {
         this.switch = true
