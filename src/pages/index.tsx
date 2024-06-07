@@ -1,7 +1,8 @@
 import type { NextPage } from 'next'
-import { useEffect } from 'react'
+// import { useEffect } from 'react'
 import styled from 'styled-components'
-import { ThreeApp } from '@/plugins/randomBoxGeometries'
+// import RandomBoxGeometriesComponents from '@/components/randomBoxGeometriesComponents'
+import RotateAsGroupComponents from '@/components/rotateAsGroupComponent'
 
 const Page = styled.div`
   width: 100vw;
@@ -17,28 +18,11 @@ const CanvasWrapper = styled.div`
 `
 
 const Home: NextPage = () => {
-  useEffect(() => {
-    const wrapper = document.getElementById('webgl')
-    if (wrapper) {
-      const app = new ThreeApp(wrapper)
-      app.render()
-    }
-    // window.addEventListener(
-    //   'DOMContentLoaded',
-    //   () => {
-    //     const wrapper = document.getElementById('webgl')
-    //     if (wrapper) {
-    //       // const app = new ThreeApp(wrapper)
-    //       // app.render()
-    //     }
-    //   },
-    //   false,
-    // )
-  }, [])
   return (
     <Page>
       <Inner>
-        <CanvasWrapper id='webgl' />
+        {/* <RandomBoxGeometriesComponents /> */}
+        <RotateAsGroupComponents />
       </Inner>
     </Page>
   )
