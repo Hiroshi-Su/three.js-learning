@@ -5,7 +5,7 @@ import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUti
 import SkyTexture from '@/assets/img/sky.jpg'
 import CraneTexture from '@/assets/img/crane.jpg'
 
-export class ThreeApp {
+export class RandomBoxGeometries {
   render: () => void // レンダー
 
   renderer // レンダラ
@@ -301,4 +301,4 @@ export class ThreeApp {
   }
 }
 
-export default ThreeApp
+export default RandomBoxGeometries

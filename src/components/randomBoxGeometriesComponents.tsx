@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import styled from 'styled-components'
-import { ThreeApp } from '@/plugins/randomBoxGeometries'
+import { RandomBoxGeometries } from '@/plugins/randomBoxGeometries'
 
 const Wrapper = styled.div`
   width: 100vw;
@@ -14,7 +14,7 @@ const RandomBoxGeometriesComponents: React.FC = () => {
   useEffect(() => {
     const wrapper = document.getElementById('webgl')
     if (wrapper) {
-      const app = new ThreeApp(wrapper)
+      const app = new RandomBoxGeometries(wrapper)
       app.render()
     }
     // window.addEventListener(
@@ -22,7 +22,7 @@ const RandomBoxGeometriesComponents: React.FC = () => {
     //   () => {
     //     const wrapper = document.getElementById('webgl')
     //     if (wrapper) {
-    //       // const app = new ThreeApp(wrapper)
+    //       // const app = new RandomBoxGeometries(wrapper)
     //       // app.render()
     //     }
     //   },

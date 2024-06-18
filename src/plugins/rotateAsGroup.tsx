@@ -4,7 +4,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 
 import SkyTexture from '@/assets/img/sky.jpg'
 
-export class ThreeApp2 {
+export class RotateAsGroup {
   render: () => void // レンダー
 
   renderer // レンダラ
@@ -383,4 +383,4 @@ export class ThreeApp2 {
   }
 }
 
-export default ThreeApp2
+export default RotateAsGroup

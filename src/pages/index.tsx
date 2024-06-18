@@ -2,7 +2,8 @@ import type { NextPage } from 'next'
 // import { useEffect } from 'react'
 import styled from 'styled-components'
 // import RandomBoxGeometriesComponents from '@/components/randomBoxGeometriesComponents'
-import RotateAsGroupComponents from '@/components/rotateAsGroupComponent'
+// import RotateAsGroupComponents from '@/components/rotateAsGroupComponent'
+import OrbitTheEarthComponents from '@/components/orbitTheEarthComponents'
 
 const Page = styled.div`
   width: 100vw;
@@ -22,7 +23,8 @@ const Home: NextPage = () => {
     <Page>
       <Inner>
         {/* <RandomBoxGeometriesComponents /> */}
-        <RotateAsGroupComponents />
+        {/* <RotateAsGroupComponents /> */}
+        <OrbitTheEarthComponents />
       </Inner>
     </Page>
   )
