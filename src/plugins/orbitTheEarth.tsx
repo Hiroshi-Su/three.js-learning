@@ -140,14 +140,14 @@ export class OrbitTheEarth {
     let moonBumpTexture: THREE.Texture // 月面用テクスチャ
     let clock: THREE.Clock
     let satellite: THREE.Mesh // 人工衛星 @@@
-    let satelliteMaterial: THREE.MeshPhongMaterial // 人工衛星用マテリアル @@@
+    let satelliteMaterial: THREE.MeshBasicMaterial // 人工衛星用マテリアル @@@
     let satelliteDirection: THREE.Vector3 // 人工衛星の進行方向 @@@
     let plane: THREE.Mesh // 旅客機 @@@
     let coneGeometry: THREE.ConeGeometry // 旅客機用メッシュ
     let planeMaterial: THREE.MeshBasicMaterial // 旅客機用マテリアル @@@
     let planeDirection: THREE.Vector3 // 旅客機の進行方向 @@@
     // let startFly: THREE.Vector3
-    let endLand: THREE.Vector3
+    // let endLand: THREE.Vector3
     let lightMesh: THREE.Mesh // 夜景
     let lightMat: THREE.MeshBasicMaterial // 夜景のマテリアル
     let earthLightsTexture: THREE.Texture // 地球夜景用テクスチャ
@@ -157,16 +157,18 @@ export class OrbitTheEarth {
     let earthCloudsTexture: THREE.Texture // 地球雲用テクスチャ
     let fresnelMesh: THREE.Mesh // 大気圏
     let artificialSatellite: THREE.Mesh // 人工衛星 @@@
-    let artificialSatelliteMaterial: THREE.MeshPhongMaterial // 人工衛星用マテリアル @@@
+    let artificialSatelliteMaterial: THREE.MeshBasicMaterial // 人工衛星用マテリアル @@@
     // let artificialSatelliteDirection: THREE.Vector3 // 人工衛星の進行方向 @@@
     let artificialSatelliteGroup: THREE.Group // 人工衛星用グループ
     // let startFly2: THREE.Vector3
     // let endLand2: THREE.Vector3
     let starGroup: THREE.Group
     let satellite2: THREE.Mesh // 人工衛星 @@@
-    let satelliteMaterial2: THREE.MeshPhongMaterial // 人工衛星用マテリアル @@@
+    let satelliteMaterial2: THREE.MeshBasicMaterial // 人工衛星用マテリアル @@@
     let satelliteDirection2: THREE.Vector3 // 人工衛星の進行方向 @@@
+    let japanPoint: THREE.Mesh
     let cityPoint: THREE.Mesh
+    // let cityPoint0: THREE.Mesh
     let earthGroup: THREE.Group
     let earthGroupLarge: THREE.Group
     let cityX: number
@@ -178,16 +180,16 @@ export class OrbitTheEarth {
     const radius = 0.5
 
     // 主要都市緯度経度一覧
-    // const citiesPoints: [number, number][] = [
-    //   [51.2838, 0], // イギリス
-    //   [39, -116], // 北京
-    //   [34, 118], // ロサンゼルス
-    //   [-33, 151], // シドニー
-    //   [-23, -46], // サンパウロ
-    //   [1, 103], // シンガポール
-    //   [90, 0], // 北極
-    //   [-90, 0], // 南極
-    // ]
+    const citiesPoints: [number, number][] = [
+      [51.2838, 0], // イギリス
+      [39, -116], // 北京
+      [34, 118], // ロサンゼルス
+      [-33, 151], // シドニー
+      [-23, -46], // サンパウロ
+      [1, 103], // シンガポール
+      [90, 0], // 北極
+      [-90, 0], // 南極
+    ]
 
     // キーの押下や離す操作を検出できるようにする
     window.addEventListener(
@@ -281,6 +283,83 @@ export class OrbitTheEarth {
     //     })
     //   })
     // }
+
+    // 都市ごとのポイント生成
+    const getCityPoint = (lat: number, lng: number) => {
+      const city = new THREE.Mesh(
+        new THREE.SphereGeometry(0.01, 20, 20),
+        new THREE.MeshBasicMaterial({ color: 0xffff00 }),
+      )
+      // scene.add(cityPoint)
+      // 仰角
+      phi = (lat * Math.PI) / 180
+      // 方位角
+      theta = ((lng - 180) * Math.PI) / 180
+      cityX = -1 * radius * Math.cos(phi) * Math.cos(theta)
+      cityY = radius * Math.sin(phi)
+      cityZ = radius * Math.cos(phi) * Math.sin(theta)
+      city.position.set(cityX, cityY, cityZ)
+      return city
+    }
+
+    /**
+     * 軌道の座標を配列で返します。
+     *
+     * @param {THREE.Vector3} startPos 開始点です。
+     * @param {THREE.Vector3} endPos 終了点です。
+     * @param {number} segmentNum セグメント分割数です。
+     * @returns {THREE.Vector3[]} 軌跡座標の配列です。
+     * @see https://ics.media/entry/10657
+     */
+    const createOrbitPoints = (
+      startPos: THREE.Vector3,
+      endPos: THREE.Vector3,
+      segmentNum: number,
+    ) => {
+      // 頂点を格納する配列
+      const vertices = []
+      const startVec = startPos.clone()
+      const endVec = endPos.clone()
+
+      // ２つのベクトルの回転軸
+      const axis = startVec.clone().cross(endVec)
+      // 軸ベクトルを単位ベクトルに
+      axis.normalize()
+      // ２つのベクトルが織りなす角度
+      const angle = startVec.angleTo(endVec)
+
+      // ２つの点を結ぶ弧を描くための頂点を打つ
+      for (let i = 0; i < segmentNum; i += 1) {
+        // axisを軸としたクォータニオンを生成
+        const q = new THREE.Quaternion()
+        q.setFromAxisAngle(axis, (angle / segmentNum) * i)
+        // ベクトルを回転させる
+        const vertex = startVec.clone().applyQuaternion(q)
+        vertices.push(vertex)
+      }
+
+      // 終了点を追加
+      vertices.push(endVec)
+      return vertices
+    }
+
+    /**
+     * 二点を結ぶラインを生成します
+     * @param {THREE.Vector3} startPoint 開始点
+     * @param {THREE.Vector3} endPoint 終了点
+     * @returns {THREE.Line} 線
+     * @see https://ics.media/entry/10657
+     */
+    const createLine = (startPoint: THREE.Vector3, endPoint: THREE.Vector3) => {
+      // 線
+      const points = createOrbitPoints(startPoint, endPoint, 15)
+      const geometry = new THREE.BufferGeometry()
+      geometry.setFromPoints(points)
+      return new THREE.Line(
+        geometry,
+        new THREE.LineBasicMaterial({ linewidth: 5, color: 0x00ffff }),
+      )
+    }
 
     /**
      * 初期化処理
@@ -427,7 +506,7 @@ export class OrbitTheEarth {
       moon.position.set(MOON_DISTANCE, 0.0, 0.0)
 
       // 人工衛星のマテリアルとメッシュ @@@
-      satelliteMaterial = new THREE.MeshPhongMaterial({ color: 0xff00dd })
+      satelliteMaterial = new THREE.MeshBasicMaterial({ color: 0xff00dd })
       satellite = new THREE.Mesh(coneGeometry, satelliteMaterial)
       scene.add(satellite)
       satellite.scale.setScalar(0.2) // より小さく
@@ -435,7 +514,7 @@ export class OrbitTheEarth {
       // 進行方向の初期値（念の為、汎用性を考えて単位化するよう記述） @@@
       satelliteDirection = new THREE.Vector3(0.0, 1.0, 0.0).normalize()
 
-      satelliteMaterial2 = new THREE.MeshPhongMaterial({ color: 0x0000ff })
+      satelliteMaterial2 = new THREE.MeshBasicMaterial({ color: 0x0000ff })
       satellite2 = new THREE.Mesh(coneGeometry, satelliteMaterial2)
       scene.add(satellite2)
       satellite2.scale.setScalar(0.2) // より小さく
@@ -446,7 +525,8 @@ export class OrbitTheEarth {
       // 旅客機のマテリアルとメッシュ
       planeMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 })
       plane = new THREE.Mesh(coneGeometry, planeMaterial)
-      scene.add(plane)
+      // scene.add(plane)
+      earthGroup.add(plane)
       plane.scale.setScalar(0.15) // より小さく
       plane.position.set(0.0, PLANE_DISTANCE, 0.0) // +Z の方向に初期位置を設定
       // 進行方向の初期値（念の為、汎用性を考えて単位化するよう記述） @@@
@@ -454,7 +534,7 @@ export class OrbitTheEarth {
 
       // 人工衛星のマテリアルとメッシュ
       artificialSatelliteGroup = new THREE.Group()
-      artificialSatelliteMaterial = new THREE.MeshPhongMaterial({
+      artificialSatelliteMaterial = new THREE.MeshBasicMaterial({
         color: 0x00ff00,
       })
       artificialSatellite = new THREE.Mesh(
@@ -481,7 +561,7 @@ export class OrbitTheEarth {
       // ).normalize()
 
       // ジオメトリからメッシュを生成
-      const icosahedronGeometry = new THREE.IcosahedronGeometry(0.03, 3)
+      const icosahedronGeometry = new THREE.IcosahedronGeometry(0.03, 1)
       // this.box = new THREE.Mesh(this.boxGeometry, this.material)
       // this.scene.add(this.box)
       // マテリアルを作成
@@ -504,39 +584,41 @@ export class OrbitTheEarth {
       }
       scene.add(starGroup)
 
-      // const cities = []
-      // citiesPoints.forEach(points => {
-      //   const city = new getDestinationPoints(0xff0000, points)
-      //   cities.push(city)
-      //   // console.log(cities)
-      //   console.log(points, city)
-      //   scene.add(city)
-      //   getApplyGpsPosition(city, city.getCoords())
-      // })
-
-      cityPoint = new THREE.Mesh(
-        new THREE.SphereGeometry(0.03, 20, 20),
-        new THREE.MeshBasicMaterial({ color: 0x00ffff }),
-      )
-      // scene.add(cityPoint)
-
+      // 都市ポイント(日本)
       const lat = 37.4900318
       const lng = 136.4664008
 
-      // const x = Math.cos(lng) * Math.sin(lat)
-      // const y = Math.sin(lng) * Math.sin(lat)
-      // const z = Math.cos(lat)
-      // 仰角
-      phi = (lat * Math.PI) / 180
-      // 方位角
-      theta = ((lng - 180) * Math.PI) / 180
-      cityX = -1 * radius * Math.cos(phi) * Math.cos(theta)
-      cityY = radius * Math.sin(phi)
-      cityZ = radius * Math.cos(phi) * Math.sin(theta)
-      cityPoint.position.set(cityX, cityY, cityZ).normalize()
+      // // 仰角
+      // phi = (lat * Math.PI) / 180
+      // // 方位角
+      // theta = ((lng - 180) * Math.PI) / 180
+      // cityX = -1 * radius * Math.cos(phi) * Math.cos(theta)
+      // cityY = radius * Math.sin(phi)
+      // cityZ = radius * Math.cos(phi) * Math.sin(theta)
+      // cityPoint.position.set(cityX, cityY, cityZ)
 
       // earthGroupLarge.add(cityPoint)
-      earthGroup.add(cityPoint)
+      japanPoint = getCityPoint(lat, lng)
+      japanPoint.scale.setScalar(1.1)
+      earthGroup.add(japanPoint)
+
+      // 世界の都市のposition
+      // const cities = []
+      citiesPoints.forEach(points => {
+        cityPoint = getCityPoint(points[0], points[1])
+        cityPoint.scale.setScalar(1.1)
+        earthGroup.add(cityPoint)
+        const line = createLine(japanPoint.position, cityPoint.position)
+        line.scale.setScalar(1.02)
+        earthGroup.add(line)
+        // const city = new getDestinationPoints(0xff0000, points)
+        // cities.push(city)
+        // // console.log(cities)
+        // console.log(points, city)
+        // scene.add(city)
+        // getApplyGpsPosition(city, city.getCoords())
+      })
+      // cityPoint0 = getCityPoint(citiesPoints[0][0], citiesPoints[0][1])
 
       // コントロール
       controls = new OrbitControls(camera, renderer.domElement)
@@ -579,13 +661,13 @@ export class OrbitTheEarth {
         // moon.rotation.y += 0.05
       }
 
-      earth.rotation.y += 0.002
+      // earth.rotation.y += 0.002
       moon.rotation.y += 0.01
-      lightMesh.rotation.y += 0.002
+      // lightMesh.rotation.y += 0.002
       cloudsMesh.rotation.y += 0.003
-      fresnelMesh.rotation.y += 0.002
+      // fresnelMesh.rotation.y += 0.002
       starGroup.rotation.y += 0.002
-      // earthGroupLarge.rotation.y += 0.002
+      earthGroup.rotation.y += 0.002
       cityPoint.rotation.y += 0.002
 
       // 前回のフレームからの経過時間の取得 @@@
@@ -677,12 +759,13 @@ export class OrbitTheEarth {
       // (A) 現在（前のフレームまで）の進行方向を変数に保持しておく @@@
       const previousDirectionPlane = planeDirection.clone()
       // startFly = new THREE.Vector3(0.0, 0.0, 0.0)
-      endLand = new THREE.Vector3(0.5, PLANE_DISTANCE, 0.0)
+      // endLand = new THREE.Vector3(0.5, PLANE_DISTANCE, 0.0)
       // const previousEndLand = endLand.clone()
       // (終点 - 始点) という計算を行うことで、２点間を結ぶベクトルを定義
       const subVectorPlane = new THREE.Vector3().subVectors(
-        endLand,
+        japanPoint.position,
         plane.position,
+        // cityPoint0.position,
       )
       subVectorPlane.normalize()
       // 旅客機の進行方向ベクトルに、向きベクトルを小さくスケールして加算する @@@
@@ -698,14 +781,15 @@ export class OrbitTheEarth {
         planeDirection,
       )
       normalAxisPlane.normalize()
-      // (D) 変換前と変換後のふたつのベクトルから内積でコサインを取り出す
-      const cosPlane = previousDirectionPlane.dot(planeDirection)
-      // (D) コサインをラジアンに戻す
-      const radiansPlane = Math.acos(cosPlane)
+      // // (D) 変換前と変換後のふたつのベクトルから内積でコサインを取り出す
+      // const cosPlane = previousDirectionPlane.dot(planeDirection)
+      // // (D) コサインをラジアンに戻す
+      // const radiansPlane = Math.acos(cosPlane)
+      const angle = previousDirectionPlane.angleTo(planeDirection)
       // 求めた法線ベクトルとラジアンからクォータニオンを定義
       const qtnPlane = new THREE.Quaternion().setFromAxisAngle(
         normalAxisPlane,
-        radiansPlane,
+        angle,
       )
       // 人工衛星の現在のクォータニオンに乗算する
       plane.quaternion.premultiply(qtnPlane)
