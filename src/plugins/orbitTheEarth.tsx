@@ -9,13 +9,9 @@ import moonBumpTextureImg from '@/assets/img/moon-bump.jpg'
 import earthBumpTextureImg from '@/assets/img/earth-bump.jpg'
 
 import getFresnelMat from './getFresnelMat'
-// import { getDestinationPoints } from '@/plugins/getDestinationPoints'
-// import { getApplyGpsPosition } from './getApplyGpsPosition'
 
 export class OrbitTheEarth {
   render: () => void
-
-  // load: () => void
 
   init: () => void
 
@@ -96,10 +92,6 @@ export class OrbitTheEarth {
      */
     const PLANE_DISTANCE = 0.55
     /**
-     * 旅客機の移動速度 @@@
-     */
-    // const PLANE_SPEED = 0
-    /**
      * 旅客機の曲がる力 @@@
      */
     const PLANE_TURN_SCALE = 0.05
@@ -107,15 +99,9 @@ export class OrbitTheEarth {
     /**
      * 人工衛星と地球の間の距離 @@@
      */
-    const ARTIFICIAL_SATELLITE_DISTANCE = 0.8
-    /**
-     * 人工衛星の移動速度 @@@
-     */
-    // const ArtificialSatellite_SPEED = 0.05
-    /**
-     * 人工衛星の曲がる力 @@@
-     */
-    // const ArtificialSatellite_TURN_SCALE = 0.08
+    const ARTIFICIAL_SATELLITE_DISTANCE = 0.7
+
+    const ARTIFICIAL_SATELLITE_TURN_SCALE = 0.05
 
     // 初期化時に canvas を append できるようにプロパティに保持
     this.wrapper = wrapper
@@ -126,13 +112,10 @@ export class OrbitTheEarth {
     // let directionalLight: THREE.DirectionalLight // 平行光源（ディレクショナルライト）
     // let ambientLight: THREE.AmbientLight // 環境光（アンビエントライト）
     let controls: OrbitControls // オービットコントロール
-    // let axesHelper: THREE.AxesHelper // 軸ヘルパー
-    let isDown: boolean // キーの押下状態用フラグ
+    // let isDown: boolean // キーの押下状態用フラグ
     let sphereGeometry: THREE.SphereGeometry // ジオメトリ
-    // let sphereGeometry: THREE.IcosahedronGeometry // ジオメトリ
     let earth: THREE.Mesh // 地球
     let earthMaterial: THREE.MeshPhongMaterial // 地球用マテリアル
-    // let earthMaterial: THREE.MeshStandardMaterial
     let earthTexture: THREE.Texture // 地球用テクスチャ
     let moon: THREE.Mesh // 月
     let moonMaterial: THREE.MeshPhongMaterial // 月用マテリアル
@@ -148,6 +131,7 @@ export class OrbitTheEarth {
     let planeDirection: THREE.Vector3 // 旅客機の進行方向 @@@
     let startFly: THREE.Vector3
     let endLand: THREE.Vector3
+    let endLand2: THREE.Vector3
     let lightMesh: THREE.Mesh // 夜景
     let lightMat: THREE.MeshBasicMaterial // 夜景のマテリアル
     let earthLightsTexture: THREE.Texture // 地球夜景用テクスチャ
@@ -158,17 +142,14 @@ export class OrbitTheEarth {
     let fresnelMesh: THREE.Mesh // 大気圏
     let artificialSatellite: THREE.Mesh // 人工衛星 @@@
     let artificialSatelliteMaterial: THREE.MeshBasicMaterial // 人工衛星用マテリアル @@@
-    // let artificialSatelliteDirection: THREE.Vector3 // 人工衛星の進行方向 @@@
+    let artificialSatelliteDirection: THREE.Vector3 // 人工衛星の進行方向 @@@
     let artificialSatelliteGroup: THREE.Group // 人工衛星用グループ
-    // let startFly2: THREE.Vector3
-    // let endLand2: THREE.Vector3
     let starGroup: THREE.Group
     let satellite2: THREE.Mesh // 人工衛星 @@@
     let satelliteMaterial2: THREE.MeshBasicMaterial // 人工衛星用マテリアル @@@
     let satelliteDirection2: THREE.Vector3 // 人工衛星の進行方向 @@@
     let japanPoint: THREE.Mesh
     let cityPoint: THREE.Mesh
-    // let cityPoint0: THREE.Mesh
     let earthGroup: THREE.Group
     let earthGroupLarge: THREE.Group
     let cityX: number
@@ -192,25 +173,25 @@ export class OrbitTheEarth {
     ]
 
     // キーの押下や離す操作を検出できるようにする
-    window.addEventListener(
-      'keydown',
-      keyEvent => {
-        switch (keyEvent.key) {
-          case ' ':
-            isDown = true
-            break
-          default:
-        }
-      },
-      false,
-    )
-    window.addEventListener(
-      'keyup',
-      () => {
-        isDown = false
-      },
-      false,
-    )
+    // window.addEventListener(
+    //   'keydown',
+    //   keyEvent => {
+    //     switch (keyEvent.key) {
+    //       case ' ':
+    //         isDown = true
+    //         break
+    //       default:
+    //     }
+    //   },
+    //   false,
+    // )
+    // window.addEventListener(
+    //   'keyup',
+    //   () => {
+    //     isDown = false
+    //   },
+    //   false,
+    // )
 
     // // マウスカーソルの動きを検出できるようにする @@@
     // window.addEventListener(
@@ -372,7 +353,6 @@ export class OrbitTheEarth {
       renderer.setSize(RENDERER_PARAM.width, RENDERER_PARAM.height)
       this.wrapper.appendChild(renderer.domElement)
       renderer.toneMapping = THREE.ACESFilmicToneMapping
-      // renderer.outputColorSpace = THREE.LinearSRGBColorSpace
 
       // シーン
       scene = new THREE.Scene()
@@ -409,7 +389,6 @@ export class OrbitTheEarth {
 
       // 球体のジオメトリを生成
       sphereGeometry = new THREE.SphereGeometry(0.5, 32, 32)
-      // sphereGeometry = new THREE.IcosahedronGeometry(1, 12)
 
       // コーンのジオメトリを生成 @@@
       coneGeometry = new THREE.ConeGeometry(0.2, 0.5, 32)
@@ -440,11 +419,7 @@ export class OrbitTheEarth {
         map: earthTexture,
         bumpMap: earthBumpTexture,
         bumpScale: 3,
-        // opacity: 0.3,
-        // transparent: true,
       })
-      // earthMaterial = new THREE.MeshStandardMaterial()
-      // earthMaterial.map = earthTexture
       earth = new THREE.Mesh(sphereGeometry, earthMaterial)
       earth.scale.setScalar(1)
       earthGroup = new THREE.Group()
@@ -457,28 +432,16 @@ export class OrbitTheEarth {
 
       // 地球を覆う夜景
       lightMat = new THREE.MeshBasicMaterial({
-        // color: 0x00ff00,
         map: earthLightsTexture,
         blending: THREE.AdditiveBlending,
-        // opacity: 0.3,
-        // transparent: true,
-        // lightMapIntensity: 0,
-        // reflectivity: 0.2,
       })
       lightMesh = new THREE.Mesh(sphereGeometry, lightMat)
       earthGroup.add(lightMesh)
 
       // 雲
       cloudsMat = new THREE.MeshStandardMaterial({
-        // color: 0x00ff00,
         map: earthCloudsTexture,
         blending: THREE.AdditiveBlending,
-        // opacity: 0.3,
-        // transparent: true,
-        // transparent: true,
-        // lightMapIntensity: 0,
-        // opacity: 0.9,
-        // reflectivity: 0.2,
       })
       cloudsMesh = new THREE.Mesh(sphereGeometry, cloudsMat)
       cloudsMesh.scale.setScalar(1.005)
@@ -490,15 +453,12 @@ export class OrbitTheEarth {
       fresnelMesh.scale.setScalar(1.01)
       earthGroup.add(fresnelMesh)
 
-      // earthGroupLarge.add(earthGroup)
-
       // 月のマテリアルとメッシュ @@@
       moonMaterial = new THREE.MeshPhongMaterial({
         map: moonTexture,
         bumpMap: moonBumpTexture,
         bumpScale: 3,
       })
-      // moonMaterial.map = moonTexture
       moon = new THREE.Mesh(sphereGeometry, moonMaterial)
       scene.add(moon)
       // 月はやや小さくして、さらに位置も動かす @@@
@@ -525,7 +485,6 @@ export class OrbitTheEarth {
       // 旅客機のマテリアルとメッシュ
       planeMaterial = new THREE.MeshPhongMaterial({ color: 0xff0000 })
       plane = new THREE.Mesh(coneGeometry, planeMaterial)
-      // scene.add(plane)
       earthGroup.add(plane)
       plane.scale.setScalar(0.15) // より小さく
       plane.position.set(0.0, PLANE_DISTANCE, 0.0) // +Z の方向に初期位置を設定
@@ -550,27 +509,24 @@ export class OrbitTheEarth {
       artificialSatelliteGroup.scale.setScalar(0.08) // より小さく
       artificialSatelliteGroup.position.set(
         0.0,
-        0.0,
         ARTIFICIAL_SATELLITE_DISTANCE,
+        0.0,
       ) // +Z の方向に初期位置を設定
       // 進行方向の初期値（念の為、汎用性を考えて単位化するよう記述） @@@
-      // artificialSatelliteDirection = new THREE.Vector3(
-      //   0.0,
-      //   0.0,
-      //   1.0,
-      // ).normalize()
+      artificialSatelliteDirection = new THREE.Vector3(
+        0.0,
+        1.0,
+        0.0,
+      ).normalize()
 
       // ジオメトリからメッシュを生成
       const icosahedronGeometry = new THREE.IcosahedronGeometry(0.03, 1)
-      // this.box = new THREE.Mesh(this.boxGeometry, this.material)
-      // this.scene.add(this.box)
       // マテリアルを作成
       const material = new THREE.MeshPhongMaterial({
         color: 0xffffff,
       })
 
       // countの数だけboxを並べる
-      // const boxes: THREE.Mesh[] = []
       starGroup = new THREE.Group()
       const count = 3000
       for (let i = 0; i < count; i += 1) {
@@ -578,8 +534,6 @@ export class OrbitTheEarth {
         box.position.x = Math.random() * 100 - 50
         box.position.y = Math.random() * 100 - 50
         box.position.z = Math.random() * 100 - 50
-        // scene.add(box)
-        // boxes.push(box)
         starGroup.add(box)
       }
       scene.add(starGroup)
@@ -587,23 +541,11 @@ export class OrbitTheEarth {
       // 都市ポイント(日本)
       const lat = 37.4900318
       const lng = 136.4664008
-
-      // // 仰角
-      // phi = (lat * Math.PI) / 180
-      // // 方位角
-      // theta = ((lng - 180) * Math.PI) / 180
-      // cityX = -1 * radius * Math.cos(phi) * Math.cos(theta)
-      // cityY = radius * Math.sin(phi)
-      // cityZ = radius * Math.cos(phi) * Math.sin(theta)
-      // cityPoint.position.set(cityX, cityY, cityZ)
-
-      // earthGroupLarge.add(cityPoint)
       japanPoint = getCityPoint(lat, lng)
       japanPoint.scale.setScalar(1.1)
       earthGroup.add(japanPoint)
 
       // 世界の都市のposition
-      // const cities = []
       citiesPoints.forEach(points => {
         cityPoint = getCityPoint(points[0], points[1])
         cityPoint.scale.setScalar(1.1)
@@ -611,26 +553,13 @@ export class OrbitTheEarth {
         const line = createLine(japanPoint.position, cityPoint.position)
         line.scale.setScalar(1.02)
         earthGroup.add(line)
-        // const city = new getDestinationPoints(0xff0000, points)
-        // cities.push(city)
-        // // console.log(cities)
-        // console.log(points, city)
-        // scene.add(city)
-        // getApplyGpsPosition(city, city.getCoords())
       })
-      // cityPoint0 = getCityPoint(citiesPoints[0][0], citiesPoints[0][1])
 
       // コントロール
       controls = new OrbitControls(camera, renderer.domElement)
 
-      // // ヘルパー
-      // const axesBarLength = 5.0
-      // axesHelper = new THREE.AxesHelper(axesBarLength)
-      // axesHelper.rotation.set(0.0, 0.0, -(23.4 * Math.PI) / 180)
-      // scene.add(axesHelper)
-
       // キーの押下状態を保持するフラグ
-      isDown = false
+      // isDown = false
 
       // - Clock オブジェクト ---------------------------------------------------
       // three.js の Clock オブジェクトを使うと、時間の経過を効率よく取得・調査す
@@ -656,17 +585,15 @@ export class OrbitTheEarth {
       controls.update()
 
       // フラグに応じてオブジェクトの状態を変化させる
-      if (isDown === true) {
-        // earth.rotation.y += 0.05
-        // moon.rotation.y += 0.05
-      }
+      // if (isDown === true) {
+      //   earth.rotation.y += 0.05
+      //   moon.rotation.y += 0.05
+      // }
 
-      // earth.rotation.y += 0.002
       moon.rotation.y += 0.01
-      // lightMesh.rotation.y += 0.002
       cloudsMesh.rotation.y += 0.003
-      // fresnelMesh.rotation.y += 0.002
       starGroup.rotation.y += 0.002
+      // groupにして回すことで、個別にearth、lightMesh、fresnelMeshを回さなくて済む
       earthGroup.rotation.y += 0.002
       cityPoint.rotation.y += 0.002
 
@@ -684,8 +611,6 @@ export class OrbitTheEarth {
         cos * ARTIFICIAL_SATELLITE_DISTANCE,
         sin * ARTIFICIAL_SATELLITE_DISTANCE,
       )
-      // cityPoint.position.set(cityX * cos, cityY * cos, cityZ)
-      // cityPoint.position.set(cos * 0.5, cityY, sin * 0.5)
 
       // 人工衛星は月を自動追尾する @@@
       // (A) 現在（前のフレームまで）の進行方向を変数に保持しておく @@@
@@ -766,16 +691,8 @@ export class OrbitTheEarth {
         0.0,
         cos2 * PLANE_DISTANCE,
       )
-      // const previousStartFly = startFly.clone()
-      // const previousEndLand = endLand.clone()
       // (終点 - 始点) という計算を行うことで、２点間を結ぶベクトルを定義
-      const subVectorPlane = new THREE.Vector3().subVectors(
-        // japanPoint.position,
-        // plane.position,
-        // cityPoint0.position,
-        endLand,
-        startFly,
-      )
+      const subVectorPlane = new THREE.Vector3().subVectors(endLand, startFly)
       subVectorPlane.normalize()
       // 旅客機の進行方向ベクトルに、向きベクトルを小さくスケールして加算する @@@
       subVectorPlane.multiplyScalar(PLANE_TURN_SCALE)
@@ -803,27 +720,40 @@ export class OrbitTheEarth {
       // 人工衛星の現在のクォータニオンに乗算する
       plane.quaternion.premultiply(qtnPlane)
 
-      // // 人工衛星の動き
-      // startFly2 = new THREE.Vector3(0.0, 0.0, 0.0)
-      // endLand2 = new THREE.Vector3(0.5, 0.5, 0.5)
-      // const subVectorArtificialSatellite = new THREE.Vector3().subVectors(
-      //   startFly2,
-      //   endLand2,
-      // )
-      // subVectorArtificialSatellite.normalize()
-      // // 人工衛星の進行方向ベクトルに、向きベクトルを小さくスケールして加算する @@@
-      // subVectorArtificialSatellite.multiplyScalar(
-      //   ArtificialSatellite_TURN_SCALE,
-      // )
-      // artificialSatelliteDirection.add(subVectorArtificialSatellite)
-      // // 加算したことでベクトルの長さが変化するので、単位化してから人工衛星の座標に加算する
-      // artificialSatelliteDirection.normalize()
-      // const directionArtificialSatellite = artificialSatelliteDirection.clone()
-      // artificialSatelliteGroup.position.add(
-      //   directionArtificialSatellite.multiplyScalar(ArtificialSatellite_SPEED),
-      // )
-
-      // console.log(directionArtificialSatellite, 'directionArtificialSatellite')
+      // 人工衛星の動き
+      // (A) 現在（前のフレームまで）の進行方向を変数に保持しておく
+      const previousDirection2 = artificialSatelliteDirection.clone()
+      endLand2 = new THREE.Vector3(
+        sin2 * -1 * ARTIFICIAL_SATELLITE_DISTANCE,
+        sin2 * -1 * ARTIFICIAL_SATELLITE_DISTANCE,
+        cos2 * ARTIFICIAL_SATELLITE_DISTANCE,
+      )
+      const subVectorArtificialSatellite = new THREE.Vector3().subVectors(
+        startFly,
+        endLand2,
+      )
+      subVectorArtificialSatellite.normalize()
+      // 人工衛星の進行方向ベクトルに、向きベクトルを小さくスケールして加算する @@@
+      subVectorArtificialSatellite.multiplyScalar(
+        ARTIFICIAL_SATELLITE_TURN_SCALE,
+      )
+      artificialSatelliteDirection.add(subVectorArtificialSatellite)
+      // (B)加算したことでベクトルの長さが変化するので、単位化してから人工衛星の座標に加算する
+      artificialSatelliteDirection.normalize()
+      // (C) 変換前と変換後の２つのベクトルから外積で法線ベクトルを求める @@@
+      const normalAxis3 = new THREE.Vector3().crossVectors(
+        previousDirection2,
+        artificialSatelliteDirection,
+      )
+      normalAxisPlane.normalize()
+      const angle2 = previousDirection2.angleTo(planeDirection)
+      // 求めた法線ベクトルとラジアンからクォータニオンを定義
+      const qtnPlane2 = new THREE.Quaternion().setFromAxisAngle(
+        normalAxis3,
+        angle2,
+      )
+      // 人工衛星の現在のクォータニオンに乗算する
+      artificialSatelliteGroup.quaternion.premultiply(qtnPlane2)
 
       // レンダラーで描画
       renderer.render(scene, camera)
