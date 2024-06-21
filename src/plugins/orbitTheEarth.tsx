@@ -98,7 +98,7 @@ export class OrbitTheEarth {
     /**
      * 旅客機の移動速度 @@@
      */
-    const PLANE_SPEED = 0.008
+    const PLANE_SPEED = 0
     /**
      * 旅客機の曲がる力 @@@
      */
@@ -675,8 +675,10 @@ export class OrbitTheEarth {
       // 経過時間をそのままラジアンとしてサインとコサインを求める
       const sin = Math.sin(time * 0.2) // 半径1の円周上のY座標(該当するラジアンの高さ)
       const cos = Math.cos(time * 0.2) // 半径1の円周上のX座標（該当するラジアンの幅）
+      const sin2 = Math.sin(time * 0.6) // 半径1の円周上のY座標(該当するラジアンの高さ)
+      const cos2 = Math.cos(time * 0.6) // 半径1の円周上のX座標（該当するラジアンの幅）
       moon.position.set(cos * MOON_DISTANCE, 0.0, sin * MOON_DISTANCE)
-      plane.position.set(cos * PLANE_DISTANCE, 0.0, sin * PLANE_DISTANCE)
+      plane.position.set(cos2 * PLANE_DISTANCE, 0.0, sin2 * PLANE_DISTANCE)
       artificialSatelliteGroup.position.set(
         cos * ARTIFICIAL_SATELLITE_DISTANCE,
         cos * ARTIFICIAL_SATELLITE_DISTANCE,
@@ -760,9 +762,9 @@ export class OrbitTheEarth {
       const previousDirectionPlane = planeDirection.clone()
       startFly = new THREE.Vector3(0.0, 0.0, 0.0)
       endLand = new THREE.Vector3(
-        sin * -1 * PLANE_DISTANCE,
+        sin2 * -1 * PLANE_DISTANCE,
         0.0,
-        cos * PLANE_DISTANCE,
+        cos2 * PLANE_DISTANCE,
       )
       // const previousStartFly = startFly.clone()
       // const previousEndLand = endLand.clone()
@@ -781,7 +783,7 @@ export class OrbitTheEarth {
       // (B) 加算したことでベクトルの長さが変化するので、単位化してから人工衛星の座標に加算する
       planeDirection.normalize()
       const directionPlane = planeDirection.clone()
-      plane.position.add(directionPlane.multiplyScalar(PLANE_SPEED))
+      // plane.position.add(directionPlane.multiplyScalar(PLANE_SPEED))
       // (C) 変換前と変換後の２つのベクトルから外積で法線ベクトルを求める @@@
       const normalAxisPlane = new THREE.Vector3().crossVectors(
         previousDirectionPlane,
