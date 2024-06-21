@@ -94,7 +94,7 @@ export class OrbitTheEarth {
     /**
      * 旅客機と地球の間の距離 @@@
      */
-    const PLANE_DISTANCE = 0.2
+    const PLANE_DISTANCE = 0.55
     /**
      * 旅客機の移動速度 @@@
      */
@@ -146,8 +146,8 @@ export class OrbitTheEarth {
     let coneGeometry: THREE.ConeGeometry // 旅客機用メッシュ
     let planeMaterial: THREE.MeshBasicMaterial // 旅客機用マテリアル @@@
     let planeDirection: THREE.Vector3 // 旅客機の進行方向 @@@
-    // let startFly: THREE.Vector3
-    // let endLand: THREE.Vector3
+    let startFly: THREE.Vector3
+    let endLand: THREE.Vector3
     let lightMesh: THREE.Mesh // 夜景
     let lightMat: THREE.MeshBasicMaterial // 夜景のマテリアル
     let earthLightsTexture: THREE.Texture // 地球夜景用テクスチャ
@@ -530,7 +530,7 @@ export class OrbitTheEarth {
       plane.scale.setScalar(0.15) // より小さく
       plane.position.set(0.0, PLANE_DISTANCE, 0.0) // +Z の方向に初期位置を設定
       // 進行方向の初期値（念の為、汎用性を考えて単位化するよう記述） @@@
-      planeDirection = new THREE.Vector3(0.0, 0.2, 0.0).normalize()
+      planeDirection = new THREE.Vector3(0.0, 1.0, 0.0).normalize()
 
       // 人工衛星のマテリアルとメッシュ
       artificialSatelliteGroup = new THREE.Group()
@@ -676,7 +676,7 @@ export class OrbitTheEarth {
       const sin = Math.sin(time * 0.2) // 半径1の円周上のY座標(該当するラジアンの高さ)
       const cos = Math.cos(time * 0.2) // 半径1の円周上のX座標（該当するラジアンの幅）
       moon.position.set(cos * MOON_DISTANCE, 0.0, sin * MOON_DISTANCE)
-      // plane.position.set(cos * PLANE_DISTANCE, 0.0, sin * PLANE_DISTANCE)
+      plane.position.set(cos * PLANE_DISTANCE, 0.0, sin * PLANE_DISTANCE)
       artificialSatelliteGroup.position.set(
         cos * ARTIFICIAL_SATELLITE_DISTANCE,
         cos * ARTIFICIAL_SATELLITE_DISTANCE,
@@ -758,14 +758,21 @@ export class OrbitTheEarth {
       // 旅客機の動き
       // (A) 現在（前のフレームまで）の進行方向を変数に保持しておく @@@
       const previousDirectionPlane = planeDirection.clone()
-      // startFly = new THREE.Vector3(0.0, 0.0, 0.0)
-      // endLand = new THREE.Vector3(0.5, PLANE_DISTANCE, 0.0)
+      startFly = new THREE.Vector3(0.0, 0.0, 0.0)
+      endLand = new THREE.Vector3(
+        sin * -1 * PLANE_DISTANCE,
+        0.0,
+        cos * PLANE_DISTANCE,
+      )
+      // const previousStartFly = startFly.clone()
       // const previousEndLand = endLand.clone()
       // (終点 - 始点) という計算を行うことで、２点間を結ぶベクトルを定義
       const subVectorPlane = new THREE.Vector3().subVectors(
-        japanPoint.position,
-        plane.position,
+        // japanPoint.position,
+        // plane.position,
         // cityPoint0.position,
+        endLand,
+        startFly,
       )
       subVectorPlane.normalize()
       // 旅客機の進行方向ベクトルに、向きベクトルを小さくスケールして加算する @@@
