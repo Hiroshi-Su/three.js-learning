@@ -98,7 +98,7 @@ export class OrbitTheEarth {
     /**
      * 旅客機の移動速度 @@@
      */
-    const PLANE_SPEED = 0
+    // const PLANE_SPEED = 0
     /**
      * 旅客機の曲がる力 @@@
      */
@@ -782,7 +782,7 @@ export class OrbitTheEarth {
       planeDirection.add(subVectorPlane)
       // (B) 加算したことでベクトルの長さが変化するので、単位化してから人工衛星の座標に加算する
       planeDirection.normalize()
-      const directionPlane = planeDirection.clone()
+      // const directionPlane = planeDirection.clone()
       // plane.position.add(directionPlane.multiplyScalar(PLANE_SPEED))
       // (C) 変換前と変換後の２つのベクトルから外積で法線ベクトルを求める @@@
       const normalAxisPlane = new THREE.Vector3().crossVectors(
