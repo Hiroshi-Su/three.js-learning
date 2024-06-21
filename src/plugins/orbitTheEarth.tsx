@@ -144,7 +144,7 @@ export class OrbitTheEarth {
     let satelliteDirection: THREE.Vector3 // 人工衛星の進行方向 @@@
     let plane: THREE.Mesh // 旅客機 @@@
     let coneGeometry: THREE.ConeGeometry // 旅客機用メッシュ
-    let planeMaterial: THREE.MeshBasicMaterial // 旅客機用マテリアル @@@
+    let planeMaterial: THREE.MeshPhongMaterial // 旅客機用マテリアル @@@
     let planeDirection: THREE.Vector3 // 旅客機の進行方向 @@@
     let startFly: THREE.Vector3
     let endLand: THREE.Vector3
@@ -523,7 +523,7 @@ export class OrbitTheEarth {
       satelliteDirection2 = new THREE.Vector3(0.0, 1.0, 0.0).normalize()
 
       // 旅客機のマテリアルとメッシュ
-      planeMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 })
+      planeMaterial = new THREE.MeshPhongMaterial({ color: 0xff0000 })
       plane = new THREE.Mesh(coneGeometry, planeMaterial)
       // scene.add(plane)
       earthGroup.add(plane)
