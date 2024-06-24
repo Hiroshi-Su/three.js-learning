@@ -3,7 +3,8 @@ import type { NextPage } from 'next'
 import styled from 'styled-components'
 // import RandomBoxGeometriesComponents from '@/components/randomBoxGeometriesComponents'
 // import RotateAsGroupComponents from '@/components/rotateAsGroupComponent'
-import OrbitTheEarthComponents from '@/components/orbitTheEarthComponents'
+// import OrbitTheEarthComponents from '@/components/orbitTheEarthComponents'
+import RaycasterEffectComponents from '@/components/raycasterEffectComponent'
 
 const Page = styled.div`
   width: 100vw;
@@ -24,7 +25,8 @@ const Home: NextPage = () => {
       <Inner>
         {/* <RandomBoxGeometriesComponents /> */}
         {/* <RotateAsGroupComponents /> */}
-        <OrbitTheEarthComponents />
+        {/* <OrbitTheEarthComponents /> */}
+        <RaycasterEffectComponents />
       </Inner>
     </Page>
   )
