@@ -111,7 +111,11 @@ export class RaycasterEffect {
     let group: THREE.Group // グループ
     let planeGeometry: THREE.PlaneGeometry // planeジオメトリ
     let planeArray: THREE.Mesh[] = [] // planeジオメトリの配列
+    let planeArray2: THREE.Mesh[] = [] // planeジオメトリの配列
+    let planeArrayLarge: THREE.Mesh[][] = [] // planeジオメトリの配列
     let planeGroup: THREE.Group // グループ
+    let planeGroup2: THREE.Group // グループ
+    let planeGroupLarge: THREE.Group // グループ
     let hitMateriaPlane: THREE.MeshBasicMaterial
     let intersectsPlane: THREE.Intersection[]
 
@@ -182,9 +186,8 @@ export class RaycasterEffect {
     const canvas = document.getElementById('canvas')
     if (canvas) {
       canvas.addEventListener(
-        'mouseover',
+        'mousemove',
         mouseEvent => {
-          console.log(mouseEvent, 'mouseEvent')
           // スクリーン空間の座標系をレイキャスター用に正規化する（-1.0 ~ 1.0 の範囲）
           const x = (mouseEvent.clientX / window.innerWidth) * 2.0 - 1.0
           const y = (mouseEvent.clientY / window.innerHeight) * 2.0 - 1.0
@@ -197,21 +200,37 @@ export class RaycasterEffect {
             camera.position,
             v.sub(camera.position).normalize(),
           )
-          console.log(ray, 'ray')
+          // console.log(ray, 'ray')
           intersectsPlane = ray.intersectObjects(planeArray)
-
-          if (intersectsPlane.length > 0) {
-            console.log(intersectsPlane, 'intersectsPlane')
-            const intersectedObjectPlane = intersectsPlane[0]
-              .object as THREE.Mesh
-            intersectedObjectPlane.material = hitMateriaPlane
-          }
-
           // レイが交差しなかった場合を考慮し一度マテリアルを通常時の状態にリセットしておく
+          planeArray.forEach((mesh, i) => {
+            // eslint-disable-next-line no-param-reassign
+            const planeCount = 100
+            const radian = (i / planeCount) * Math.PI * 2
+            mesh.position.set(
+              8.5 * Math.cos(radian), // X座標
+              0, // Y座標
+              8.5 * Math.sin(radian), // Z座標
+            )
+          })
           planeArray.forEach(mesh => {
             // eslint-disable-next-line no-param-reassign
             mesh.material = material
           })
+
+          if (intersectsPlane.length > 0) {
+            // console.log(intersectsPlane, 'intersectsPlane')
+            const intersectedObjectPlane = intersectsPlane[0]
+              .object as THREE.Mesh
+            // ホバーしたものの色変える
+            intersectedObjectPlane.material = hitMateriaPlane
+            console.log(intersectedObjectPlane.position, 'position')
+
+            // ホバーしたものをy軸に0.2
+            intersectedObjectPlane.position.y = 0.2
+            // const vector3 = new THREE.Vector3(1, 1, 1.2)
+            // intersectedObjectPlane.position.multiply(vector3)
+          }
         },
         false,
       )
@@ -244,7 +263,6 @@ export class RaycasterEffect {
     window.addEventListener(
       'wheel',
       (event: WheelEvent) => {
-        console.log(event, 'event')
         preDeltaY = 0
         curDeltaY = event.deltaY
         if (curDeltaY >= preDeltaY) {
@@ -329,7 +347,11 @@ export class RaycasterEffect {
       group = new THREE.Group()
       scene.add(group)
       planeGroup = new THREE.Group()
-      scene.add(planeGroup)
+      // scene.add(planeGroup)
+      planeGroup2 = new THREE.Group()
+      // scene.add(planeGroup2)
+      planeGroupLarge = new THREE.Group()
+      scene.add(planeGroupLarge)
 
       // トーラスメッシュ
       const torusCount = 5
@@ -346,20 +368,67 @@ export class RaycasterEffect {
       }
 
       // planeメッシュ
-      const planeCount = 100
+      const planeCount = 10
+      const totalGroup = 5
+      //角度
+      const deg = 360 / planeCount
+      //ラジアン
+      const rad = (deg * Math.PI) / 180
+      //半径
+      const r = 8.5
       // const diameter = planeCount / 10
       planeGeometry = new THREE.PlaneGeometry(1, 1)
       planeArray = []
+      planeArray2 = []
+      planeArrayLarge = [planeArray]
+
       for (let i = 0; i < planeCount; i += 1) {
         const plane = new THREE.Mesh(planeGeometry, material)
-        const radian = (i / planeCount) * Math.PI * 2
+        // const radian = (i / planeCount) * Math.PI * 2
         plane.position.set(
-          8 * Math.cos(radian), // X座標
+          r * Math.cos(rad * i), // X座標
           0, // Y座標
-          8 * Math.sin(radian), // Z座標
+          r * Math.sin(rad * i), // Z座標
         )
+
+        //向きを中心に設定
+        // plane.rotation.y = 5
+        // plane.lookAt(0, 0, 0)
+        // console.log(planeGroup, 'planeGroup')
         planeGroup.add(plane)
         planeArray.push(plane)
+      }
+      planeGroupLarge.add(planeGroup)
+      for (let k = 0; k < planeCount; k += 1) {
+        const plane = new THREE.Mesh(planeGeometry, material)
+        const radian = (k / planeCount) * Math.PI * 2
+        plane.position.set(
+          r * Math.cos(rad * k), // X座標
+          0, // Y座標
+          r * Math.sin(rad * k), // Z座標
+        )
+
+        //向きを中心に設定
+        // plane.rotation.y = 5
+        // plane.lookAt(0, 0, 0)
+        // console.log(planeGroup2, 'planeGroup2')
+        planeGroup2.add(plane)
+        planeArray2.push(plane)
+      }
+      planeGroupLarge.add(planeGroup2)
+
+      // それぞれのgroupのy軸の位置変える
+      for (let j = 0; j < planeArrayLarge.length; j += 1) {
+        planeGroupLarge.children[j].position.set(
+          0, // X座標
+          j * 0.2, // Y座標
+          0, // Z座標
+        )
+        console.log(planeGroupLarge, 'planeGroupLarge')
+
+        // planeGroup.position.y = j * 0.5
+        // planeGroupLarge.add(planeGroup)
+        // planeArrayLarge.push(planeArray)
       }
 
       // 軸ヘルパー
