@@ -44,7 +44,7 @@ export class RaycasterEffect {
       aspect: window.innerWidth / window.innerHeight,
       near: 0.1,
       far: 50.0,
-      position: new THREE.Vector3(0.0, 2.0, 20.0),
+      position: new THREE.Vector3(0.0, 10.0, 18.0),
       lookAt: new THREE.Vector3(0.0, 0.0, 0.0),
     }
     /**
@@ -108,6 +108,8 @@ export class RaycasterEffect {
     let controls: OrbitControls // オービットコントロール
     let axesHelper: THREE.AxesHelper // 軸ヘルパー
     // let isDown: boolean // キーの押下状態用フラグ
+    let isWheel: boolean // wheel操作状態用フラグ
+    let wheelEndTimeout: NodeJS.Timeout | undefined
     // let group: THREE.Group // グループ
     let planeGeometry: THREE.PlaneGeometry // planeジオメトリ
     let planeArray: THREE.Mesh[] = [] // planeジオメトリの配列
@@ -124,7 +126,7 @@ export class RaycasterEffect {
     // const planeCount = 10
     // const totalGroup = 5
 
-    const groupCount = 4
+    const groupCount = 5
     const planeInGroup = 10
     const totalCount = groupCount * planeInGroup
 
@@ -243,8 +245,12 @@ export class RaycasterEffect {
             intersectedObjectPlane.material = hitMateriaPlane
             console.log(intersectedObjectPlane.position, 'position')
 
+            // ホバーしたものをx軸に0.2
+            // intersectedObjectPlane.position.x =
+            //   intersectedObjectPlane.position.x + 0.5
             // ホバーしたものをy軸に0.2
             intersectedObjectPlane.position.y = 0.2
+
             // const vector3 = new THREE.Vector3(1, 1, 1.2)
             // intersectedObjectPlane.position.multiply(vector3)
           }
@@ -277,9 +283,43 @@ export class RaycasterEffect {
     // スクロール操作を検出できるようにする
     let preDeltaY: number
     let curDeltaY: number
+    isWheel = false
+    if (wheelEndTimeout) {
+      clearTimeout(wheelEndTimeout)
+    }
     window.addEventListener(
       'wheel',
       (event: WheelEvent) => {
+        isWheel = true
+        if (wheelEndTimeout) {
+          clearTimeout(wheelEndTimeout)
+          wheelEndTimeout = undefined
+        }
+
+        if (isWheel) {
+          for (let j = 0; j < planeGroupLarge.children.length; j += 1) {
+            planeGroupLarge.children[j].position.set(
+              0, // X座標
+              0, // Y座標
+              0, // Z座標
+            )
+          }
+          const wheelEndTimeoutId = setTimeout(() => {
+            isWheel = false
+            console.log('wheelが終了したよ')
+            // NOTE: ここにwheel終了後の処理を書く
+            // それぞれのgroupのy軸の位置変える
+            for (let j = 0; j < planeGroupLarge.children.length; j += 1) {
+              planeGroupLarge.children[j].position.set(
+                0, // X座標
+                j * 0.3 * -1, // Y座標
+                0, // Z座標
+              )
+            }
+          }, 100)
+          wheelEndTimeout = wheelEndTimeoutId
+        }
+
         preDeltaY = 0
         curDeltaY = event.deltaY
         if (curDeltaY >= preDeltaY) {
@@ -294,6 +334,20 @@ export class RaycasterEffect {
       },
       false,
     )
+
+    // window.removeEventListener(
+    //   'wheel',
+    //   () => {
+    //     for (let j = 0; j < planeGroupLarge.children.length; j += 1) {
+    //       planeGroupLarge.children[j].position.set(
+    //         0, // X座標
+    //         j * 0.2, // Y座標
+    //         0, // Z座標
+    //       )
+    //     }
+    //   },
+    //   false,
+    // )
 
     // ウィンドウのリサイズを検出できるようにする
     window.addEventListener(
@@ -397,13 +451,14 @@ export class RaycasterEffect {
 
       for (let i = 0; i < totalCount; i += 1) {
         const plane = new THREE.Mesh(planeGeometry, material)
+        const eachRadian = rad * i
         plane.position.set(
-          r * Math.cos(rad * i), // X座標
+          r * Math.cos(eachRadian), // X座標
           0, // Y座標
-          r * Math.sin(rad * i), // Z座標
+          r * Math.sin(eachRadian), // Z座標
         )
         // 向きを中心に設定
-        // plane.rotation.y = 5
+        plane.rotation.y = -1 * eachRadian
         // plane.lookAt(0, 0, 0)
         // planeGroup.add(plane)
         console.log(plane, 'plane')
@@ -428,11 +483,9 @@ export class RaycasterEffect {
       for (let j = 0; j < planeGroupLarge.children.length; j += 1) {
         planeGroupLarge.children[j].position.set(
           0, // X座標
-          j * 0.5, // Y座標
+          j * 0.3 * -1, // Y座標
           0, // Z座標
         )
-        console.log(planeGroupLarge, 'planeGroupLarge')
-
         // planeGroup.position.y = j * 0.5
         // planeGroupLarge.add(planeGroup)
         // planeArrayLarge.push(planeArray)
