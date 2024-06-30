@@ -102,22 +102,30 @@ export class RaycasterEffect {
     let ambientLight // 環境光（アンビエントライト）
     let material: THREE.MeshBasicMaterial // マテリアル
     let hitMaterial: THREE.MeshPhongMaterial // レイが交差した際のマテリアル @@@
-    let torusGeometry: THREE.TorusGeometry // トーラスジオメトリ
-    let torusArray: THREE.Mesh[] = [] // トーラスメッシュの配列
+    // let torusGeometry: THREE.TorusGeometry // トーラスジオメトリ
+    // let torusArray: THREE.Mesh[] = [] // トーラスメッシュの配列
     let texture: THREE.Texture // テクスチャ
     let controls: OrbitControls // オービットコントロール
     let axesHelper: THREE.AxesHelper // 軸ヘルパー
     // let isDown: boolean // キーの押下状態用フラグ
-    let group: THREE.Group // グループ
+    // let group: THREE.Group // グループ
     let planeGeometry: THREE.PlaneGeometry // planeジオメトリ
     let planeArray: THREE.Mesh[] = [] // planeジオメトリの配列
-    let planeArray2: THREE.Mesh[] = [] // planeジオメトリの配列
-    let planeArrayLarge: THREE.Mesh[][] = [] // planeジオメトリの配列
+    // let planeArray2: THREE.Mesh[] = [] // planeジオメトリの配列
+    // let planeArrayLarge: THREE.Mesh[][] = [] // planeジオメトリの配列
     let planeGroup: THREE.Group // グループ
     let planeGroup2: THREE.Group // グループ
-    let planeGroupLarge: THREE.Group // グループ
+    // let planeGroupLarge: THREE.Group // グループ
     let hitMateriaPlane: THREE.MeshBasicMaterial
     let intersectsPlane: THREE.Intersection[]
+
+    // planeメッシュ
+    const planeCount = 10
+    // const totalGroup = 5
+    // 角度
+    const deg = 360 / planeCount
+    // ラジアン
+    const rad = (deg * Math.PI) / 180
 
     // Raycaster のインスタンスを生成する @@@
     const raycaster: THREE.Raycaster = new THREE.Raycaster()
@@ -132,13 +140,14 @@ export class RaycasterEffect {
         const v = new THREE.Vector2(x, -y)
         // レイキャスターに正規化済みマウス座標とカメラを指定する
         raycaster.setFromCamera(v, camera)
-        // scene に含まれるすべてのオブジェクト（ここでは Mesh）を対象にレイキャストする
-        const intersects = raycaster.intersectObjects(torusArray)
-        // レイが交差しなかった場合を考慮し一度マテリアルを通常時の状態にリセットしておく
-        torusArray.forEach(mesh => {
-          // eslint-disable-next-line no-param-reassign
-          mesh.material = material
-        })
+
+        // // scene に含まれるすべてのオブジェクト（ここでは Mesh）を対象にレイキャストする
+        // const intersects = raycaster.intersectObjects(torusArray)
+        // // レイが交差しなかった場合を考慮し一度マテリアルを通常時の状態にリセットしておく
+        // torusArray.forEach(mesh => {
+        //   // eslint-disable-next-line no-param-reassign
+        //   mesh.material = material
+        // })
 
         // for plane
         // scene に含まれるすべてのオブジェクト（ここでは Mesh）を対象にレイキャストする
@@ -160,10 +169,10 @@ export class RaycasterEffect {
         // 戻り値の中身は object というプロパティを経由することで対象の Mesh など
         // のオブジェクトを参照できる他、交点の座標などもわかります。
         // ----------------------------------------------------------------------
-        if (intersects.length > 0) {
-          const intersectedObject = intersects[0].object as THREE.Mesh
-          intersectedObject.material = hitMaterial
-        }
+        // if (intersects.length > 0) {
+        //   const intersectedObject = intersects[0].object as THREE.Mesh
+        //   intersectedObject.material = hitMaterial
+        // }
 
         if (intersectsObjsPlane.length > 0) {
           console.log(intersectsObjsPlane, 'intersectsObjsPlane')
@@ -205,12 +214,12 @@ export class RaycasterEffect {
           // レイが交差しなかった場合を考慮し一度マテリアルを通常時の状態にリセットしておく
           planeArray.forEach((mesh, i) => {
             // eslint-disable-next-line no-param-reassign
-            const planeCount = 100
-            const radian = (i / planeCount) * Math.PI * 2
+            // const planeCount = 10
+            // const radian = (i / planeCount) * Math.PI * 2
             mesh.position.set(
-              8.5 * Math.cos(radian), // X座標
+              8.5 * Math.cos(rad * i), // X座標
               0, // Y座標
-              8.5 * Math.sin(radian), // Z座標
+              8.5 * Math.sin(rad * i), // Z座標
             )
           })
           planeArray.forEach(mesh => {
@@ -344,43 +353,43 @@ export class RaycasterEffect {
       hitMateriaPlane.map = texture
 
       // グループ
-      group = new THREE.Group()
-      scene.add(group)
+      // group = new THREE.Group()
+      // scene.add(group)
       planeGroup = new THREE.Group()
-      // scene.add(planeGroup)
+      scene.add(planeGroup)
       planeGroup2 = new THREE.Group()
-      // scene.add(planeGroup2)
-      planeGroupLarge = new THREE.Group()
-      scene.add(planeGroupLarge)
+      scene.add(planeGroup2)
+      // planeGroupLarge = new THREE.Group()
+      // scene.add(planeGroupLarge)
 
       // トーラスメッシュ
-      const torusCount = 5
-      const transformScale = 5.0
-      torusGeometry = new THREE.TorusGeometry(0.5, 0.2, 8, 16)
-      torusArray = []
-      for (let i = 0; i < torusCount; i += 1) {
-        const torus = new THREE.Mesh(torusGeometry, material)
-        torus.position.x = (Math.random() * 2.0 - 1.0) * transformScale
-        torus.position.y = (Math.random() * 2.0 - 1.0) * transformScale
-        torus.position.z = (Math.random() * 2.0 - 1.0) * transformScale
-        group.add(torus)
-        torusArray.push(torus)
-      }
+      // const torusCount = 5
+      // const transformScale = 5.0
+      // torusGeometry = new THREE.TorusGeometry(0.5, 0.2, 8, 16)
+      // torusArray = []
+      // for (let i = 0; i < torusCount; i += 1) {
+      //   const torus = new THREE.Mesh(torusGeometry, material)
+      //   torus.position.x = (Math.random() * 2.0 - 1.0) * transformScale
+      //   torus.position.y = (Math.random() * 2.0 - 1.0) * transformScale
+      //   torus.position.z = (Math.random() * 2.0 - 1.0) * transformScale
+      //   group.add(torus)
+      //   torusArray.push(torus)
+      // }
 
-      // planeメッシュ
-      const planeCount = 10
-      const totalGroup = 5
-      //角度
-      const deg = 360 / planeCount
-      //ラジアン
-      const rad = (deg * Math.PI) / 180
-      //半径
+      // // planeメッシュ
+      // const planeCount = 10
+      // // const totalGroup = 5
+      // // 角度
+      // const deg = 360 / planeCount
+      // // ラジアン
+      // const rad = (deg * Math.PI) / 180
+      // 半径
       const r = 8.5
       // const diameter = planeCount / 10
       planeGeometry = new THREE.PlaneGeometry(1, 1)
       planeArray = []
-      planeArray2 = []
-      planeArrayLarge = [planeArray]
+      // planeArray2 = []
+      // planeArrayLarge = [planeArray]
 
       for (let i = 0; i < planeCount; i += 1) {
         const plane = new THREE.Mesh(planeGeometry, material)
@@ -391,45 +400,45 @@ export class RaycasterEffect {
           r * Math.sin(rad * i), // Z座標
         )
 
-        //向きを中心に設定
+        // 向きを中心に設定
         // plane.rotation.y = 5
         // plane.lookAt(0, 0, 0)
         // console.log(planeGroup, 'planeGroup')
         planeGroup.add(plane)
         planeArray.push(plane)
       }
-      planeGroupLarge.add(planeGroup)
-      for (let k = 0; k < planeCount; k += 1) {
-        const plane = new THREE.Mesh(planeGeometry, material)
-        const radian = (k / planeCount) * Math.PI * 2
-        plane.position.set(
-          r * Math.cos(rad * k), // X座標
-          0, // Y座標
-          r * Math.sin(rad * k), // Z座標
-        )
+      // planeGroupLarge.add(planeGroup)
+      // for (let k = 0; k < planeCount; k += 1) {
+      //   const plane = new THREE.Mesh(planeGeometry, material)
+      //   // const radian = (k / planeCount) * Math.PI * 2
+      //   plane.position.set(
+      //     r * Math.cos(rad * k), // X座標
+      //     0, // Y座標
+      //     r * Math.sin(rad * k), // Z座標
+      //   )
 
-        //向きを中心に設定
-        // plane.rotation.y = 5
-        // plane.lookAt(0, 0, 0)
-        // console.log(planeGroup2, 'planeGroup2')
-        planeGroup2.add(plane)
-        planeArray2.push(plane)
-      }
-      planeGroupLarge.add(planeGroup2)
+      //   //向きを中心に設定
+      //   // plane.rotation.y = 5
+      //   // plane.lookAt(0, 0, 0)
+      //   // console.log(planeGroup2, 'planeGroup2')
+      //   planeGroup2.add(plane)
+      //   planeArray2.push(plane)
+      // }
+      // planeGroupLarge.add(planeGroup2)
 
       // それぞれのgroupのy軸の位置変える
-      for (let j = 0; j < planeArrayLarge.length; j += 1) {
-        planeGroupLarge.children[j].position.set(
-          0, // X座標
-          j * 0.2, // Y座標
-          0, // Z座標
-        )
-        console.log(planeGroupLarge, 'planeGroupLarge')
+      // for (let j = 0; j < planeArrayLarge.length; j += 1) {
+      //   planeGroupLarge.children[j].position.set(
+      //     0, // X座標
+      //     j * 2, // Y座標
+      //     0, // Z座標
+      //   )
+      //   console.log(planeGroupLarge, 'planeGroupLarge')
 
-        // planeGroup.position.y = j * 0.5
-        // planeGroupLarge.add(planeGroup)
-        // planeArrayLarge.push(planeArray)
-      }
+      //   // planeGroup.position.y = j * 0.5
+      //   // planeGroupLarge.add(planeGroup)
+      //   // planeArrayLarge.push(planeArray)
+      // }
 
       // 軸ヘルパー
       const axesBarLength = 5.0
