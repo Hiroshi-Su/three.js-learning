@@ -111,21 +111,29 @@ export class RaycasterEffect {
     // let group: THREE.Group // グループ
     let planeGeometry: THREE.PlaneGeometry // planeジオメトリ
     let planeArray: THREE.Mesh[] = [] // planeジオメトリの配列
-    // let planeArray2: THREE.Mesh[] = [] // planeジオメトリの配列
     // let planeArrayLarge: THREE.Mesh[][] = [] // planeジオメトリの配列
     let planeGroup: THREE.Group // グループ
     let planeGroup2: THREE.Group // グループ
-    // let planeGroupLarge: THREE.Group // グループ
+    let planeGroup3: THREE.Group // グループ
+    let planeGroup4: THREE.Group // グループ
+    let planeGroupLarge: THREE.Group // グループ
     let hitMateriaPlane: THREE.MeshBasicMaterial
     let intersectsPlane: THREE.Intersection[]
 
     // planeメッシュ
-    const planeCount = 10
+    // const planeCount = 10
     // const totalGroup = 5
+
+    const groupCount = 4
+    const planeInGroup = 10
+    const totalCount = groupCount * planeInGroup
+
     // 角度
-    const deg = 360 / planeCount
+    const deg = 360 / totalCount
     // ラジアン
     const rad = (deg * Math.PI) / 180
+    // 半径
+    const r = 8.5
 
     // Raycaster のインスタンスを生成する @@@
     const raycaster: THREE.Raycaster = new THREE.Raycaster()
@@ -217,9 +225,9 @@ export class RaycasterEffect {
             // const planeCount = 10
             // const radian = (i / planeCount) * Math.PI * 2
             mesh.position.set(
-              8.5 * Math.cos(rad * i), // X座標
+              r * Math.cos(rad * i), // X座標
               0, // Y座標
-              8.5 * Math.sin(rad * i), // Z座標
+              r * Math.sin(rad * i), // Z座標
             )
           })
           planeArray.forEach(mesh => {
@@ -275,10 +283,12 @@ export class RaycasterEffect {
         preDeltaY = 0
         curDeltaY = event.deltaY
         if (curDeltaY >= preDeltaY) {
-          planeGroup.rotation.y += 0.05
+          // planeGroup.rotation.y += 0.05
+          planeGroupLarge.rotation.y += 0.05
           preDeltaY = event.deltaY
         } else if (curDeltaY < preDeltaY) {
-          planeGroup.rotation.y -= 0.05
+          // planeGroup.rotation.y -= 0.05
+          planeGroupLarge.rotation.y -= 0.05
           preDeltaY = event.deltaY
         }
       },
@@ -356,11 +366,15 @@ export class RaycasterEffect {
       // group = new THREE.Group()
       // scene.add(group)
       planeGroup = new THREE.Group()
-      scene.add(planeGroup)
+      // scene.add(planeGroup)
       planeGroup2 = new THREE.Group()
-      scene.add(planeGroup2)
-      // planeGroupLarge = new THREE.Group()
-      // scene.add(planeGroupLarge)
+      // scene.add(planeGroup2)
+      planeGroup3 = new THREE.Group()
+      // scene.add(planeGroup3)
+      planeGroup4 = new THREE.Group()
+      // scene.add(planeGroup4)
+      planeGroupLarge = new THREE.Group()
+      scene.add(planeGroupLarge)
 
       // トーラスメッシュ
       // const torusCount = 5
@@ -376,24 +390,13 @@ export class RaycasterEffect {
       //   torusArray.push(torus)
       // }
 
-      // // planeメッシュ
-      // const planeCount = 10
-      // // const totalGroup = 5
-      // // 角度
-      // const deg = 360 / planeCount
-      // // ラジアン
-      // const rad = (deg * Math.PI) / 180
-      // 半径
-      const r = 8.5
       // const diameter = planeCount / 10
       planeGeometry = new THREE.PlaneGeometry(1, 1)
       planeArray = []
-      // planeArray2 = []
       // planeArrayLarge = [planeArray]
 
-      for (let i = 0; i < planeCount; i += 1) {
+      for (let i = 0; i < totalCount; i += 1) {
         const plane = new THREE.Mesh(planeGeometry, material)
-        // const radian = (i / planeCount) * Math.PI * 2
         plane.position.set(
           r * Math.cos(rad * i), // X座標
           0, // Y座標
@@ -403,8 +406,24 @@ export class RaycasterEffect {
         // 向きを中心に設定
         // plane.rotation.y = 5
         // plane.lookAt(0, 0, 0)
-        // console.log(planeGroup, 'planeGroup')
-        planeGroup.add(plane)
+
+        for (let j = 0; j < planeInGroup; j += 1) {
+          planeGroup.add(plane)
+        }
+        planeGroupLarge.add(planeGroup)
+        for (let k = 10; k < planeInGroup * 2; k += 1) {
+          planeGroup2.add(plane)
+        }
+        planeGroupLarge.add(planeGroup2)
+        for (let l = 20; l < planeInGroup * 3; l += 1) {
+          planeGroup3.add(plane)
+        }
+        planeGroupLarge.add(planeGroup3)
+        for (let m = 30; m < planeInGroup * 4; m += 1) {
+          planeGroup4.add(plane)
+        }
+        planeGroupLarge.add(planeGroup4)
+
         planeArray.push(plane)
       }
       // planeGroupLarge.add(planeGroup)
