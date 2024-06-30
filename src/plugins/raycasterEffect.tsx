@@ -423,24 +423,6 @@ export class RaycasterEffect {
         // scene.add(planeGroup)
       }
       scene.add(planeGroupLarge)
-      // planeGroupLarge.add(planeGroup)
-      // for (let k = 0; k < planeCount; k += 1) {
-      //   const plane = new THREE.Mesh(planeGeometry, material)
-      //   // const radian = (k / planeCount) * Math.PI * 2
-      //   plane.position.set(
-      //     r * Math.cos(rad * k), // X座標
-      //     0, // Y座標
-      //     r * Math.sin(rad * k), // Z座標
-      //   )
-
-      //   //向きを中心に設定
-      //   // plane.rotation.y = 5
-      //   // plane.lookAt(0, 0, 0)
-      //   // console.log(planeGroup2, 'planeGroup2')
-      //   planeGroup2.add(plane)
-      //   planeArray2.push(plane)
-      // }
-      // planeGroupLarge.add(planeGroup2)
 
       // それぞれのgroupのy軸の位置変える
       for (let j = 0; j < planeGroupLarge.children.length; j += 1) {
