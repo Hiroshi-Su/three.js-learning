@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react'
+import styled from 'styled-components'
 import Lenis from 'lenis'
 import { useRouter } from 'next/router'
 import useWindowResize from '@/lib/hooks/handleWindowResize'
@@ -7,6 +8,12 @@ type Props = {
   children: React.ReactNode
 }
 
+const ScrollWrapper = styled.div`
+  width: 100%;
+  height: auto;
+  position: relative;
+  scroll-behavior: auto;
+`
 export const ScrollBarContext = React.createContext<Lenis | null>(null)
 
 export const ScrollProvider: React.FC<Props> = ({ children }) => {
@@ -97,20 +104,14 @@ export const ScrollProvider: React.FC<Props> = ({ children }) => {
   return (
     <>
       <ScrollBarContext.Provider value={LenisInstance}>
-        <div id='scroll-wrapper' ref={scrollWrapper} className='scroll-wrapper'>
+        <ScrollWrapper
+          id='scroll-wrapper'
+          ref={scrollWrapper}
+          className='scroll-wrapper'
+        >
           {children}
-        </div>
+        </ScrollWrapper>
       </ScrollBarContext.Provider>
-      <style jsx>
-        {`
-          .scroll-wrapper {
-            width: 100%;
-            height: auto;
-            position: relative;
-            scroll-behavior: auto;
-          }
-        `}
-      </style>
     </>
   )
 }

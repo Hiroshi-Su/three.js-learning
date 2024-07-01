@@ -206,7 +206,7 @@ export class RaycasterEffect {
 
     const canvas = document.getElementById('canvas')
     if (canvas) {
-      let lastIntersectedObject: any // 最後に交差したオブジェクトを追跡
+      let lastIntersectedObject: THREE.Mesh | null // 最後に交差したオブジェクトを追跡
       canvas.addEventListener(
         'mousemove',
         mouseEvent => {
