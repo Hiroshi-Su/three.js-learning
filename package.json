@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@types/three": "^0.164.0",
+    "lenis": "^1.1.5",
     "next": "^14.2.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

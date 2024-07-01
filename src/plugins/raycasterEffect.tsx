@@ -113,6 +113,7 @@ export class RaycasterEffect {
     // let group: THREE.Group // グループ
     let planeGeometry: THREE.PlaneGeometry // planeジオメトリ
     let planeArray: THREE.Mesh[] = [] // planeジオメトリの配列
+    let planeArrayDummy: THREE.Mesh[] = [] // planeジオメトリの配列 mousemove用
     // let planeArrayLarge: THREE.Mesh[][] = [] // planeジオメトリの配列
     // let planeGroup: THREE.Group // グループ
     // let planeGroup2: THREE.Group // グループ
@@ -121,6 +122,7 @@ export class RaycasterEffect {
     let planeGroupLarge: THREE.Group // グループ
     let hitMateriaPlane: THREE.MeshBasicMaterial
     let intersectsPlane: THREE.Intersection[]
+    let intersectsPlaneDummy: THREE.Intersection[]
 
     // planeメッシュ
     // const planeCount = 10
@@ -204,6 +206,7 @@ export class RaycasterEffect {
 
     const canvas = document.getElementById('canvas')
     if (canvas) {
+      let lastIntersectedObject: any // 最後に交差したオブジェクトを追跡
       canvas.addEventListener(
         'mousemove',
         mouseEvent => {
@@ -219,13 +222,10 @@ export class RaycasterEffect {
             camera.position,
             v.sub(camera.position).normalize(),
           )
-          // console.log(ray, 'ray')
-          intersectsPlane = ray.intersectObjects(planeArray)
+          intersectsPlane = ray.intersectObjects(planeArrayDummy)
           // レイが交差しなかった場合を考慮し一度マテリアルを通常時の状態にリセットしておく
           planeArray.forEach((mesh, i) => {
             // eslint-disable-next-line no-param-reassign
-            // const planeCount = 10
-            // const radian = (i / planeCount) * Math.PI * 2
             mesh.position.set(
               r * Math.cos(rad * i), // X座標
               0, // Y座標
@@ -237,22 +237,41 @@ export class RaycasterEffect {
             mesh.material = material
           })
 
-          if (intersectsPlane.length > 0) {
-            // console.log(intersectsPlane, 'intersectsPlane')
-            const intersectedObjectPlane = intersectsPlane[0]
+          intersectsPlaneDummy = ray.intersectObjects(planeArrayDummy)
+
+          // if (intersectsPlane.length > 0) {
+          //   // console.log(intersectsPlane, 'intersectsPlane')
+          //   const intersectedObjectPlane = intersectsPlane[0]
+          //     .object as THREE.Mesh
+          //   // ホバーしたものの色変える
+          //   intersectedObjectPlane.material = hitMateriaPlane
+          //   console.log(intersectedObjectPlane.position, 'position')
+
+          //   // ホバーしたものをx軸に0.2
+          //   // intersectedObjectPlane.position.x =
+          //   //   intersectedObjectPlane.position.x + 0.5
+          //   // ホバーしたものをy軸に0.2
+          //   intersectedObjectPlane.position.y = 0.2
+          // }
+          // 前回交差したオブジェクトを元の位置に戻す
+          if (lastIntersectedObject) {
+            lastIntersectedObject.position.y = 0
+            lastIntersectedObject = null
+          }
+
+          if (intersectsPlane.length > 0 && intersectsPlaneDummy.length > 0) {
+            const intersectedObjectDummy = intersectsPlaneDummy[0]
               .object as THREE.Mesh
-            // ホバーしたものの色変える
-            intersectedObjectPlane.material = hitMateriaPlane
-            console.log(intersectedObjectPlane.position, 'position')
+            const intersectedIndex = planeArrayDummy.indexOf(
+              intersectedObjectDummy,
+            )
 
-            // ホバーしたものをx軸に0.2
-            // intersectedObjectPlane.position.x =
-            //   intersectedObjectPlane.position.x + 0.5
-            // ホバーしたものをy軸に0.2
-            intersectedObjectPlane.position.y = 0.2
-
-            // const vector3 = new THREE.Vector3(1, 1, 1.2)
-            // intersectedObjectPlane.position.multiply(vector3)
+            if (intersectedIndex !== -1) {
+              const intersectedObjectPlane = planeArray[intersectedIndex]
+              intersectedObjectPlane.material = hitMateriaPlane
+              intersectedObjectPlane.position.y = 0.2
+              lastIntersectedObject = intersectedObjectPlane
+            }
           }
         },
         false,
@@ -447,6 +466,7 @@ export class RaycasterEffect {
       // const diameter = planeCount / 10
       planeGeometry = new THREE.PlaneGeometry(1, 1)
       planeArray = []
+      planeArrayDummy = []
       // planeArrayLarge = [planeArray]
 
       for (let i = 0; i < totalCount; i += 1) {
@@ -461,9 +481,9 @@ export class RaycasterEffect {
         plane.rotation.y = -1 * eachRadian
         // plane.lookAt(0, 0, 0)
         // planeGroup.add(plane)
-        console.log(plane, 'plane')
         // planeGroupLarge.add(plane)
         planeArray.push(plane)
+        planeArrayDummy.push(plane)
       }
 
       for (let i = 0; i < groupCount; i += 1) {

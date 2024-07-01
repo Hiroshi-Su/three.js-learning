@@ -1273,6 +1273,11 @@
   dependencies:
     "@jridgewell/trace-mapping" "0.3.9"
 
+"@darkroom.engineering/tempus@^0.0.46":
+  version "0.0.46"
+  resolved "https://registry.yarnpkg.com/@darkroom.engineering/tempus/-/tempus-0.0.46.tgz#3d958807503e4055fcc4a1aeeff83ca0546c62f0"
+  integrity sha512-s5vav3KMHYezvUCl4ee5epg0oimF6M8C9gAaKxFnFaTvX2q3ywFDryIv6XLd0mRFUt3S1uHDJqKaiEcs2ZVSvw==
+
 "@emotion/is-prop-valid@^1.2.1":
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/@emotion/is-prop-valid/-/is-prop-valid-1.2.1.tgz#23116cf1ed18bfeac910ec6436561ecb1a3885cc"
@@ -4547,6 +4552,13 @@ language-tags@^1.0.9:
   integrity sha512-MbjN408fEndfiQXbFQ1vnd+1NoLDsnQW41410oQBXiyXDMYH5z505juWa4KUE1LqxRC7DgOgZDbKLxHIwm27hA==
   dependencies:
     language-subtag-registry "^0.3.20"
+
+lenis@^1.1.5:
+  version "1.1.5"
+  resolved "https://registry.yarnpkg.com/lenis/-/lenis-1.1.5.tgz#6579f725567dc0d6df64702a071e073a24007d86"
+  integrity sha512-RNpGFoOVFGboCdJ7EUcMTUNZC7d/AJV1ad8eBTYBdL2TuwdWJ11Mb5jx4dLreHadH8Mg2o+3uVHQHTd4txasaw==
+  dependencies:
+    "@darkroom.engineering/tempus" "^0.0.46"
 
 levn@^0.4.1:
   version "0.4.1"
