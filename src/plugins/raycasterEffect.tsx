@@ -222,7 +222,7 @@ export class RaycasterEffect {
             camera.position,
             v.sub(camera.position).normalize(),
           )
-          intersectsPlane = ray.intersectObjects(planeArrayDummy)
+          intersectsPlane = ray.intersectObjects(planeArray)
           // レイが交差しなかった場合を考慮し一度マテリアルを通常時の状態にリセットしておく
           planeArray.forEach((mesh, i) => {
             // eslint-disable-next-line no-param-reassign
@@ -329,9 +329,14 @@ export class RaycasterEffect {
             // NOTE: ここにwheel終了後の処理を書く
             // それぞれのgroupのy軸の位置変える
             for (let j = 0; j < planeGroupLarge.children.length; j += 1) {
+              // planeGroupLarge.children[j].position.set(
+              //   0, // X座標
+              //   j * 0.3 * -1, // Y座標
+              //   0, // Z座標
+              // )
               planeGroupLarge.children[j].position.set(
                 0, // X座標
-                j * 0.3 * -1, // Y座標
+                Math.sin((j * 0.3 * -1 * Math.PI) / 2), // Y座標
                 0, // Z座標
               )
             }
